@@ -1,0 +1,21 @@
+MulT_unaligned_mosi:
+  model: MulT
+  aligned: False
+  dataset: mosi
+  MAE:  0.9657705
+  Correlation Coefficient:  0.6636994070256488
+  mult_acc_7:  0.3760932944606414
+  mult_acc_5:  0.42419825072886297
+  F1 score:  0.8019275222786552
+  Accuracy:  0.801829268292683
+
+MulT_aligned_mosi:
+  model: MulT
+  aligned: True
+  dataset: mosi
+  MAE:  0.9610811
+  Correlation Coefficient:  0.6700705100042449
+  mult_acc_7:  0.35276967930029157
+  mult_acc_5:  0.41690962099125367
+  F1 score:  0.7884916700813192
+  Accuracy:  0.7896341463414634
