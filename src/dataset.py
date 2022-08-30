@@ -29,7 +29,6 @@ class Multimodal_Datasets(Dataset):
         self.audio[self.audio == -np.inf] = 0
         self.audio = torch.tensor(self.audio).cpu().detach()
         self.labels = torch.tensor(dataset[split_type]['labels'].astype(np.float32)).cpu().detach()
-        
         # Note: this is STILL an numpy array
         self.meta = dataset[split_type]['id'] if 'id' in dataset[split_type].keys() else None
        

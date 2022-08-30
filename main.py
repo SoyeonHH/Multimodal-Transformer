@@ -73,6 +73,7 @@ parser.add_argument('--seed', type=int, default=1111,
                     help='random seed')
 parser.add_argument('--no_cuda', action='store_true',
                     help='do not use cuda')
+parser.add_argument('--device', type=str, default='cuda:0')
 parser.add_argument('--name', type=str, default='mult',
                     help='name of the trial (default: "mult")')
 args = parser.parse_args()
@@ -119,9 +120,9 @@ train_data = get_data(args, dataset, 'train')
 valid_data = get_data(args, dataset, 'valid')
 test_data = get_data(args, dataset, 'test')
    
-train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True)
-valid_loader = DataLoader(valid_data, batch_size=args.batch_size, shuffle=True)
-test_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=True)
+train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, generator=torch.Generator(device=args.device))
+valid_loader = DataLoader(valid_data, batch_size=args.batch_size, shuffle=True, generator=torch.Generator(device=args.device))
+test_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=True, generator=torch.Generator(device=args.device))
 
 print('Finish loading the data....')
 if not args.aligned:

@@ -31,9 +31,11 @@ def get_CTC_module(hyp_params):
 
 def initiate(hyp_params, train_loader, valid_loader, test_loader):
     model = getattr(models, hyp_params.model+'Model')(hyp_params)
+    device = hyp_params.device
 
     if hyp_params.use_cuda:
-        model = model.cuda()
+        # model = model.cuda()
+        model = model.to(device)
 
     optimizer = getattr(optim, hyp_params.optim)(model.parameters(), lr=hyp_params.lr)
     criterion = getattr(nn, hyp_params.criterion)()
@@ -46,7 +48,8 @@ def initiate(hyp_params, train_loader, valid_loader, test_loader):
         ctc_criterion = CTCLoss()
         ctc_a2l_module, ctc_v2l_module = get_CTC_module(hyp_params)
         if hyp_params.use_cuda:
-            ctc_a2l_module, ctc_v2l_module = ctc_a2l_module.cuda(), ctc_v2l_module.cuda()
+            # ctc_a2l_module, ctc_v2l_module = ctc_a2l_module.cuda(), ctc_v2l_module.cuda()
+            ctc_a2l_module, ctc_v2l_module = ctc_a2l_module.to(device), ctc_v2l_module.to(device)
         ctc_a2l_optimizer = getattr(optim, hyp_params.optim)(ctc_a2l_module.parameters(), lr=hyp_params.lr)
         ctc_v2l_optimizer = getattr(optim, hyp_params.optim)(ctc_v2l_module.parameters(), lr=hyp_params.lr)
     
@@ -81,6 +84,7 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
     ctc_criterion = settings['ctc_criterion']
     
     scheduler = settings['scheduler']
+    device = hyp_params.device
     
 
     def train(model, optimizer, criterion, ctc_a2l_module, ctc_v2l_module, ctc_a2l_optimizer, ctc_v2l_optimizer, ctc_criterion):
@@ -100,7 +104,8 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 
             if hyp_params.use_cuda:
                 with torch.cuda.device(0):
-                    text, audio, vision, eval_attr = text.cuda(), audio.cuda(), vision.cuda(), eval_attr.cuda()
+                    # text, audio, vision, eval_attr = text.cuda(), audio.cuda(), vision.cuda(), eval_attr.cuda()
+                    text, audio, vision, eval_attr = text.to(device), audio.to(device), vision.to(device), eval_attr.to(device)
                     if hyp_params.dataset == 'iemocap':
                         eval_attr = eval_attr.long()
             
@@ -128,7 +133,8 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 ctc_a2l_loss = ctc_criterion(a2l_position.transpose(0,1).cpu(), l_position, a_length, l_length)
                 ctc_v2l_loss = ctc_criterion(v2l_position.transpose(0,1).cpu(), l_position, v_length, l_length)
                 ctc_loss = ctc_a2l_loss + ctc_v2l_loss
-                ctc_loss = ctc_loss.cuda() if hyp_params.use_cuda else ctc_loss
+                # ctc_loss = ctc_loss.cuda() if hyp_params.use_cuda else ctc_loss
+                ctc_loss = ctc_loss.to(device) if hyp_params.use_cuda else ctc_loss
             else:
                 ctc_loss = 0
             ######## CTC ENDS ########
@@ -201,7 +207,8 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
             
                 if hyp_params.use_cuda:
                     with torch.cuda.device(0):
-                        text, audio, vision, eval_attr = text.cuda(), audio.cuda(), vision.cuda(), eval_attr.cuda()
+                        # text, audio, vision, eval_attr = text.cuda(), audio.cuda(), vision.cuda(), eval_attr.cuda()
+                        text, audio, vision, eval_attr = text.to(device), audio.to(device), vision.to(device), eval_attr.to(device)
                         if hyp_params.dataset == 'iemocap':
                             eval_attr = eval_attr.long()
                         
