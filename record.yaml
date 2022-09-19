@@ -57,15 +57,3 @@ MulT_unaligned_mosei:
   mult_acc_5:  0.506117192530586
   F1 score:  0.8087659553205028
   Accuracy:  0.7996697853604843
-
-MulT_aligned_mosei:
-  model: MulT
-  aligned: True
-  dataset: mosei
-  mode: paper_setting
-  MAE:  0.62624216
-  Correlation Coefficient:  0.6634546526860391
-  mult_acc_7:  0.4858927417617919
-  mult_acc_5:  0.5016153349127719
-  F1 score:  0.8133627694537654
-  Accuracy:  0.811878453038674

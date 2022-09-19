@@ -56,6 +56,8 @@ def eval_mosei_senti(results, truths, exclude_zero=False):
 
     print("-" * 50)
 
+    return mae, corr, mult_a7, mult_a5, f_score, accuracy_score(binary_truth, binary_preds)
+
 
 def eval_mosi(results, truths, exclude_zero=False):
     return eval_mosei_senti(results, truths, exclude_zero)
