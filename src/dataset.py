@@ -33,6 +33,7 @@ class Multimodal_Datasets(Dataset):
         self.meta = dataset[split_type]['id'] if 'id' in dataset[split_type].keys() else None
        
         self.data = data
+        self.split_type = split_type
         
         self.n_modalities = 3 # vision/ text/ audio
     def get_n_modalities(self):
@@ -54,5 +55,5 @@ class Multimodal_Datasets(Dataset):
             META = (self.meta[index][0].decode('UTF-8'), self.meta[index][1].decode('UTF-8'), self.meta[index][2].decode('UTF-8'))
         if self.data == 'iemocap':
             Y = torch.argmax(Y, dim=-1)
-        return X, Y, META        
+        return X, Y, META
 

@@ -143,6 +143,5 @@ class MULTModel(nn.Module):
         last_hs_proj += last_hs
         
         output = self.out_layer(last_hs_proj)
-        return output, proj_x_a, proj_x_l, proj_x_v,\
-             h_a_with_ls, h_a_with_vs, h_l_with_as, h_l_with_vs, h_v_with_as, h_v_with_ls, \
-                last_h_a, last_h_l, last_h_v, last_hs
+        return h_a_with_ls, h_a_with_vs, h_l_with_as, h_l_with_vs, h_v_with_as, h_v_with_ls, \
+                last_h_a, last_h_l, last_h_v, last_hs, output
