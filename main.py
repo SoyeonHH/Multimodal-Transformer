@@ -3,6 +3,7 @@ import argparse
 from src.utils import *
 from torch.utils.data import DataLoader
 from src import train
+import wandb
 
 
 parser = argparse.ArgumentParser(description='MOSEI Sentiment Analysis')
@@ -149,5 +150,7 @@ hyp_params.criterion = criterion_dict.get(dataset, 'L1Loss')
 
 
 if __name__ == '__main__':
+    wandb.init(project=hyp_params.model)
+    wandb.config.update(hyp_params)
     test_loss = train.initiate(hyp_params, train_loader, valid_loader, test_loader)
 

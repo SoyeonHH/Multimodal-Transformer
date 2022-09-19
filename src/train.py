@@ -1,3 +1,4 @@
+from email.utils import make_msgid
 import torch
 from torch import nn
 import sys
@@ -10,6 +11,7 @@ import time
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import os
 import pickle
+import wandb
 
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
@@ -38,6 +40,7 @@ def initiate(hyp_params, train_loader, valid_loader, test_loader):
         model = model.to(device)
 
     optimizer = getattr(optim, hyp_params.optim)(model.parameters(), lr=hyp_params.lr)
+    optimizer.param_groups[0]['capturable'] = True
     criterion = getattr(nn, hyp_params.criterion)()
     if hyp_params.aligned or hyp_params.model=='MULT':
         ctc_criterion = None
@@ -240,9 +243,9 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
     best_valid = 1e8
     for epoch in range(1, hyp_params.num_epochs+1):
         start = time.time()
-        train(model, optimizer, criterion, ctc_a2l_module, ctc_v2l_module, ctc_a2l_optimizer, ctc_v2l_optimizer, ctc_criterion)
+        train_loss = train(model, optimizer, criterion, ctc_a2l_module, ctc_v2l_module, ctc_a2l_optimizer, ctc_v2l_optimizer, ctc_criterion)
         val_loss, _, _ = evaluate(model, ctc_a2l_module, ctc_v2l_module, criterion, test=False)
-        test_loss, _, _ = evaluate(model, ctc_a2l_module, ctc_v2l_module, criterion, test=True)
+        test_loss, results, truths = evaluate(model, ctc_a2l_module, ctc_v2l_module, criterion, test=True)
         
         end = time.time()
         duration = end-start
@@ -254,8 +257,26 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
         
         if val_loss < best_valid:
             print(f"Saved model at pre_trained_models/{hyp_params.name}.pt!")
-            save_model(hyp_params, model, name=hyp_params.name)
+            save_model(hyp_params, model, name=hyp_params.name+hyp_params.dataset)
             best_valid = val_loss
+        
+        mae, corr, mult_a7, mult_a5, f_score, acc_2 = eval_mosei_senti(results, truths, True) 
+
+        wandb.log(
+            (
+                {
+                    "train_loss": train_loss,
+                    "valid_loss": val_loss,
+                    "test_acc_2": acc_2,
+                    "test_mult_5": mult_a5,
+                    "test_mult_7": mult_a7,
+                    "test_mae": mae,
+                    "test_corr": corr,
+                    "test_f_score": f_score,
+                    "best_valid_loss": best_valid,
+                }
+            )
+        )
 
     model = load_model(hyp_params, name=hyp_params.name)
     _, results, truths = evaluate(model, ctc_a2l_module, ctc_v2l_module, criterion, test=True)
